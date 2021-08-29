@@ -2,6 +2,8 @@
 const db = require("../models"); 
 // Utilisation de l'opérateur Op de sequelize 
 const { Op } = require("sequelize");
+// Import de jsonwebtoken
+const jwt = require('jsonwebtoken');
 // Import de bcrypt afin de chiffrer le mot de passe 
 const bcrypt = require('bcrypt');
 // Import de crypto-js pour chiffrer le mail
@@ -55,11 +57,32 @@ exports.login = async (req, res) => {
         // Si le mot de passe ne correspond pas au login une erreur est retournée
         return res.status(401).send({ error: "Le mot de passe est incorrect !" });
       } else {
-        // Sonin la connexion est OK
-        res.status(200).send( "Vous êtes connecté" )
+        // Sinon la connexion est OK
+        //res.status(200).send( "Vous êtes connecté" )
+        res.status(200).json({
+          message: 'Connexion OK',
+          userId: user.id,
+          token: jwt.sign(
+          {userId: user.id},
+          process.env.TOKEN,
+          {expiresIn: '24h'}
+          )
+      })
       }
     }
   } catch (error) {
     return res.status(400).send({ error: "Connexion impossible, veuillez réessayer plus tard" });
   }
 };
+
+// Afficher tous les profils
+// Problème de sécurité ??
+/* 
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await db.User.findAll({ raw: true }).then((users) => {res.status(200).json(users)})
+  } catch (error) {
+    return res.status(400).send({ error: "Aucune information disponible pour le moment" });
+  }
+};
+*/

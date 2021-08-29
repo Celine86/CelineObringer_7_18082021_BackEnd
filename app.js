@@ -29,10 +29,10 @@ app.get('/', function(req, res) {
 })
 
 // Utilisation de la fonction express.json qui va parser les requêtes entrantes
+// Middleware qui va vérifier le header content type, et faire un JSON.parse si c'est bien du json
 app.use(express.json());
 // Utilisation de urlencoded qui est une méthode d'express permettant d'identifier les requêtes entrantes comme des chaines (strings) ou tableaux (arrays).
 app.use(express.urlencoded({ extended: true }));
-
 
 // Creation des routes
 app.use('/api/users', require('./routes/user'));
