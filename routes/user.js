@@ -11,7 +11,7 @@ const mailValid = require('../middleware/mailcheck')
 
 // Signup et Login
 router.post("/signup", pswdValid, mailValid, userCtrl.signup);
-router.get("/login", userCtrl.login);
+router.post("/login", userCtrl.login);
 // Voir un ou tous les profils 
 //router.get("/profils", userCtrl.getAllUsers);
 //router.get("/profils/:id", usersCtrl.getUser);

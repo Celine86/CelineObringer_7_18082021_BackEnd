@@ -14,7 +14,7 @@ db.sequelize.authenticate()
   .then(() => console.log('Connexion à la base de données réussie'))
   .catch(err => console.log('Connexion impossible: ' + err))
 // Import de l'objet Sequelize 
-const { sequelize } = require('./models/index');
+// const { sequelize } = require('./models/index');
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
