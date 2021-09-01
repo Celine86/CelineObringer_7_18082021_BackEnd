@@ -1,38 +1,31 @@
 'use strict';
-
-const { DataTypes } = require("sequelize/types");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Posts', {
       id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        //defaultValue: Sequelize.UUIDV4,
-        //type: DataTypes.UUID
         type: Sequelize.INTEGER
       },
-      username: {
+      idUSER: {
         allowNull: false,
-        unique: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        }
       },
-      email: {
-        allowNull: false,
-        unique: true,
-        type: Sequelize.STRING
-      },
-      password: {
+      title: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      avatar: {
+      content: {
+        allowNull: false,
         type: Sequelize.STRING
       },
-      role: {
-        allowNull: false,
-        defaultValue: false,
-        type: Sequelize.BOOLEAN
+      attachment: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -45,6 +38,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Posts');
   }
 };

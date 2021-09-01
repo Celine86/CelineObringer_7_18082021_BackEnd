@@ -7,30 +7,32 @@ const jwt = require('jsonwebtoken');
 // Import de bcrypt afin de chiffrer le mot de passe 
 const bcrypt = require('bcrypt');
 // Import de crypto-js pour chiffrer le mail
-const cryptojs = require('crypto-js');
+// const cryptojs = require('crypto-js');
 // Import de dotenv qui charge les variables de .env dans process.env 
 require('dotenv').config();
+// Import de file-systeme pour les images 
+const fs = require("fs");
 
 // SIGNUP pour l'enregistrement d'un profil
 exports.signup = async (req, res) => {
   try {
     // Vérification si le compte en train d'être créé existe déjà
     // Chiffrement du mail entré afin de le comparer aux mails en BDD
-    let encryptedMail = cryptojs.HmacSHA512(req.body.email, process.env.CRYPTO).toString();
+    //let encryptedMail = cryptojs.HmacSHA512(req.body.email, process.env.CRYPTO).toString();
     const user = await db.User.findOne({
       // Recherche en base de la présence d'un mail ou pseudonyme structement similaire à ceux entrés 
-      where: { [Op.or]: [{username: req.body.username}, {email: encryptedMail}] },
+      where: { [Op.or]: [{username: req.body.username}, {email: req.body.email}] },
     });
     // Si la recherche retourne un résultat on indique que le psudonyme ou le mail est déjà utilisé 
     if (user !== null) {
         return res.status(400).json({ message: "Ce pseudonyme ou cet email est déjà utilisé" });
     } else {
         // Sinon le compte est créé 
-        let encryptedMail = cryptojs.HmacSHA512(req.body.email, process.env.CRYPTO).toString();
+        //let encryptedMail = cryptojs.HmacSHA512(req.body.email, process.env.CRYPTO).toString();
         const hashed = await bcrypt.hash(req.body.password, 10)
-          const newUser = await db.User.create({
+          db.User.create({
           username: req.body.username,
-          email: encryptedMail,
+          email: req.body.email,
           password: hashed
         });
       res.status(201).send({ message: 'Votre compte est créé' });
@@ -75,14 +77,32 @@ exports.login = async (req, res) => {
   }
 };
 
-// Afficher tous les profils
-// Problème de sécurité ??
-/* 
-exports.getAllUsers = async (req, res) => {
+// Retrouver UN utilisateur 
+exports.getOneUser = async (req, res) => {
   try {
-    const users = await db.User.findAll({ raw: true }).then((users) => {res.status(200).json(users)})
+    const user = await db.User.findOne({ attributes: ["id", "username", "email", "avatar"],
+    where: { id: req.params.id } });
+    res.status(200).send({userInfos : user});
+    //console.log(user);
   } catch (error) {
     return res.status(400).send({ error: "Aucune information disponible pour le moment" });
   }
 };
+
+/*
+exports.updateUser = async (req,res) => {
+
+}
 */
+//Retrouver tous les utilisateurs 
+exports.getAllUsers = async (req, res) => {
+    try {
+      const users = await db.User.findAll({ attributes: ["id", "username", "email", "avatar"],
+      where: { role: { [Op.ne]: 1, },
+      },
+    });
+    res.status(200).send(users);
+  } catch (error) {
+    return res.status(400).send({ error: "Aucune information disponible pour le moment" });
+  }
+};
