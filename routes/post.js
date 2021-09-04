@@ -11,11 +11,13 @@ const multer = require('../middleware/multer')
 
 // Creer un post
 router.post("/create", auth.signin, multer, postCtrl.createPost);
-
 // Voir tous les posts
 router.get("/", auth.signin, postCtrl.getAllPosts);
 // Voir un post 
 router.get("/:id", auth.signin, postCtrl.getOnePost);
+// Ajouter un commentaire
+router.post("/:id/comment", auth.signin, postCtrl.createComment);
+
 
 // Export du module 
 module.exports = router;
