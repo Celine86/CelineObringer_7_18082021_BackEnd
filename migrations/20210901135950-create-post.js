@@ -22,9 +22,9 @@ module.exports = {
       },
       content: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
-      attachment: {
+      imageUrl: {
         type: Sequelize.STRING
       },
       createdAt: {

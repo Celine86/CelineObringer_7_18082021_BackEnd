@@ -19,10 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Post.init({
-    idUSER: DataTypes.INTEGER,
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    attachment: DataTypes.STRING
+    title: { type: DataTypes.STRING, allowNull: false },
+    content: { type: DataTypes.TEXT, allowNull: false },
+    imageUrl: { type: DataTypes.STRING, allowNull: true },
   }, {
     sequelize,
     modelName: 'Post',

@@ -11,12 +11,12 @@ const MIME_TYPES = {
 // Configuration de multer afin que les images soient envoyées dans images et le nom du fichier formaté 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'avatars');
+    callback(null, 'images');
   },
   filename: (req, file, callback) => {
     const name = file.originalname.split(' ').join('_');
     const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + '.' + extension);
+    callback(null, Date.now() + '.' + extension);
   }
 });
 

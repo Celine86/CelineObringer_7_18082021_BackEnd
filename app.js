@@ -24,9 +24,11 @@ app.use((req, res, next) => {
 }); 
 
 // Test de la réponse du serveur via le navigateur directement 
+/*
 app.get('/', function(req, res) {
     res.status(200).send('<h1>Test</h1>')
 })
+*/
 
 // Utilisation de la fonction express.json qui va parser les requêtes entrantes
 // Middleware qui va vérifier le header content type, et faire un JSON.parse si c'est bien du json
@@ -36,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Creation des routes
 app.use('/api/users', require('./routes/user'));
+app.use('/api/posts', require('./routes/post'));
 
 // Export des modules pour utilisation dans d'autres fichiers 
 module.exports = app;
