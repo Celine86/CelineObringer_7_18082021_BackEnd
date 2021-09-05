@@ -11,7 +11,7 @@ const mailValid = require('../middleware/mailcheck');
 // Import des règles concernant le token 
 const auth = require('../middleware/auth');
 // Import de multer pour les avatars
-// const multer = require('../middleware/multer')
+const multer = require('../middleware/multer')
 
 // Signup et Login
 router.post("/signup", pswdValid, mailValid, userCtrl.signup);
@@ -21,7 +21,10 @@ router.post("/login", userCtrl.login);
 router.get("/profils", auth.signin, userCtrl.getAllUsers);
 router.get("/profils/:id", auth.signin, userCtrl.getOneUser);
 // Modifier son propre profil
-router.put("/profils/:id", auth.signin, userCtrl.getMyAccount);
+router.put("/profils/:id", auth.signin, multer ,userCtrl.modifyAccount);
+// Supprimer son propre profil
+router.delete("/profils/:id", auth.signin, multer ,userCtrl.deleteAccount);
+
 
 // Export du module 
 module.exports = router;

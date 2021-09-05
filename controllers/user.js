@@ -13,7 +13,7 @@ const bcrypt = require('bcrypt');
 // Import de dotenv qui charge les variables de .env dans process.env 
 require('dotenv').config();
 // Import de file-systeme pour les images 
-// const fs = require("fs");
+const fs = require("fs");
 
 // SIGNUP pour l'enregistrement d'un profil
 exports.signup = async (req, res, next) => {
@@ -35,7 +35,7 @@ exports.signup = async (req, res, next) => {
           db.User.create({
           username: req.body.username,
           email: req.body.email,
-          password: hashed
+          password: hashed,
         });
       res.status(201).send({ message: 'Votre compte est créé' });
     }
@@ -99,16 +99,65 @@ exports.getAllUsers = async (req, res, next) => {
 };
 
 // Retrouver son compte afin de pouvoir le modifier si besoin 
-exports.getMyAccount = async (req, res, next) => {
+exports.modifyAccount = async (req, res, next) => {
   try {
     const userId = auth.getUserID(req);
     const user = await db.User.findOne({ where: { id: req.params.id } });
+    let newAvatar;
     if (req.params.id === userId){
-      res.status(200).send({userInfos : user});
+      if (req.file && user.avatar) {
+        newAvatar = `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`;
+      const filename = user.avatar.split("/images")[1];
+      fs.unlink(`images/${filename}`, (err) => {
+        if (err) console.log(err);
+        else {
+          console.log(`Deleted file: images/${filename}`);
+        }
+      });
+    } else if (req.file) {
+      newAvatar = `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`;
+    }
+    if (newAvatar) {
+      user.avatar = newAvatar;
+    }
+    const newUser = await user.save({ fields: ["avatar"] });
+    res.status(200).json({
+      user: newUser,
+      message: "Votre avatar a bien été modifié",
+    });
     } else {
       return res.status(401).send({ error: "Vous n'êtes pas autorisé à modifier ce profil" });
     }
   } catch (error) {
     return res.status(500).send({ error: "Erreur Serveur" });
+  }
+};
+
+// Supprimer son compte
+exports.deleteAccount = async (req, res) => {
+  try {
+      const userId = auth.getUserID(req);
+      const isAdmin = await db.User.findOne({ where: { id: userId } }); 
+      const user = await db.User.findOne({ where: { id: req.params.id } });
+      if (req.params.id === userId || isAdmin.role === true){
+      if (user.avatar !== null) {
+        const filename = user.avatar.split("/images")[1];
+        fs.unlink(`images/${filename}`, () => {
+          db.User.destroy({ where: { id: req.params.id } });
+          res.status(200).json({ message: "Compte supprimé" });
+        });
+        } else {
+          db.User.destroy({ where: { id: req.params.id } });
+          res.status(200).json({ message: "Compte supprimé" });
+        }
+    } else {
+      return res.status(401).send({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });
+    } 
+  } catch (error) {
+    return res.status(500).send({ error: "Erreur serveur" });
   }
 };
