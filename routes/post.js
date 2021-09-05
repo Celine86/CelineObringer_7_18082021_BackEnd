@@ -15,8 +15,18 @@ router.post("/create", auth.signin, multer, postCtrl.createPost);
 router.get("/", auth.signin, postCtrl.getAllPosts);
 // Voir un post 
 router.get("/:id", auth.signin, postCtrl.getOnePost);
+// Supprimer un post
+router.delete("/:id", auth.signin, multer, postCtrl.deletePost);
+// Modifier un post
+router.put("/:id", auth.signin, multer, postCtrl.modifyPost);
+
 // Ajouter un commentaire
 router.post("/:id/comment", auth.signin, postCtrl.createComment);
+// Supprimer un commentaire
+router.delete("/comment/:id", auth.signin, postCtrl.deleteComment);
+// Modifier un commentaire
+router.put("/comment/:id", auth.signin, postCtrl.modifyComment);
+
 // Ajouter un like 
 router.post("/:id/like", auth.signin, postCtrl.addLike);
 

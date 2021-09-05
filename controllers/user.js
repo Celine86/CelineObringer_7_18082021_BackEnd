@@ -102,9 +102,7 @@ exports.getAllUsers = async (req, res, next) => {
 exports.getMyAccount = async (req, res, next) => {
   try {
     const userId = auth.getUserID(req);
-    console.log(userId) 
     const user = await db.User.findOne({ where: { id: req.params.id } });
-    console.log(req.params.id)
     if (req.params.id === userId){
       res.status(200).send({userInfos : user});
     } else {
