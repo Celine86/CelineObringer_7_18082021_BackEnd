@@ -9,9 +9,9 @@ const fs = require("fs");
 
 // CREATION d'un POST
 exports.createPost = async (req, res, next) => {
-    let imageUrl = "";
-    const userId = auth.getUserID(req);
-    try{
+    try {
+        let imageUrl = "";
+        const userId = auth.getUserID(req);
         const user = await db.User.findOne({ where: { id: userId } });
         if(user !== null) { 
             if (req.file) {
@@ -42,8 +42,12 @@ exports.getOnePost = async (req, res, next) => {
             attributes: ["id", "title", "content", "imageUrl"], 
             include: [
                 {model: db.User, attributes: ["username", "email", "avatar"]},
+                {model: db.Like, 
+                    attributes: ["UserId"],
+                    include: [ {model: db.User, attributes: ["username"]}  ] 
+                },
                 {model: db.Comment, 
-                    order: [["createdAt", "DESC"]], 
+                    order: [["id", "DESC"]], 
                     attributes: ["comment"],
                     include: [ {model: db.User, attributes: ["username", "email"]} ]
                 }, 
@@ -64,8 +68,12 @@ exports.getAllPosts = async (req, res, next) => {
         attributes: ['id', 'title', 'content', 'imageUrl'],
         include: [
             {model: db.User, attributes: ["username", "email", "avatar"]},
+            {model: db.Like, 
+                attributes: ["UserId"],
+                //include: [ {model: db.User, attributes: ["username"]}  ] 
+            },
             {model: db.Comment, 
-                order: [["createdAt", "DESC"]],
+                order: [["id", "DESC"]],
                 attributes: ["comment"],
                 include: [ {model: db.User, attributes: ["username", "email"]}  ] 
             },
@@ -78,9 +86,9 @@ exports.getAllPosts = async (req, res, next) => {
 };
 
 // Créer un commentaire 
-exports.createComment = async (req, res, next) => {
-    const userId = auth.getUserID(req);
-    try{
+exports.createComment = async (req, res, next) => {    
+    try {
+        const userId = auth.getUserID(req);
         const user = await db.User.findOne({ where: { id: userId } });
         if (user !== null) { 
             const myComment = await db.Comment.create({
@@ -92,6 +100,31 @@ exports.createComment = async (req, res, next) => {
         }
         else {
             return res.status(403).send({ error: "Le commentaire n'a pas pu être ajouté" });
+        }
+    } catch (error) {
+        return res.status(500).send({ error: "Erreur Serveur" });
+    }
+}
+
+// Liker un post
+exports.addLike = async (req, res, next) => {
+    try {
+        const userId = auth.getUserID(req);
+        const postId = req.params.id;
+        // On cherche si l'utilisateur aime déjà le post en question
+        const userLiked = await db.Like.findOne({ where: { UserId: userId, PostId: postId }, });
+        if (userLiked) {
+            await db.Like.destroy(
+                { where: { UserId: userId, PostId: postId } },
+                { truncate: true, restartIdentity: true }                
+            );
+            res.status(200).send({ message: "vous n'aimez plus ce post :(" });
+        } else {
+            await db.Like.create({
+                UserId: userId,
+                PostId: postId,
+            });
+            res.status(200).json({ message: "vous aimez ce post !" });
         }
     } catch (error) {
         return res.status(500).send({ error: "Erreur Serveur" });

@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       models.User.hasMany(models.Post);
       models.User.hasMany(models.Comment);
+      models.User.hasMany(models.Like);
     }
   };
   User.init({
@@ -20,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     username: { type: DataTypes.STRING, allowNull: false, unique: true },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     password: { type: DataTypes.STRING, allowNull: false },
-    avatar: { type: DataTypes.STRING},
+    avatar: { type: DataTypes.STRING, defaultValue: "http://localhost:3000/images/default.png"},
     role: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: false }
   }, {
     sequelize,

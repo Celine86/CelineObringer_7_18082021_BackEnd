@@ -17,7 +17,8 @@ router.get("/", auth.signin, postCtrl.getAllPosts);
 router.get("/:id", auth.signin, postCtrl.getOnePost);
 // Ajouter un commentaire
 router.post("/:id/comment", auth.signin, postCtrl.createComment);
-
+// Ajouter un like 
+router.post("/:id/like", auth.signin, postCtrl.addLike);
 
 // Export du module 
 module.exports = router;
