@@ -1,12 +1,7 @@
-// Import des models afin d'avoir le modele Post et le modele Index de Sequelize
 const db = require("../models"); 
-// Utilisation de l'opérateur Op de sequelize 
-// const { Op } = require("sequelize");
-// Import du middleware auth pour vérifier le token 
 const auth = require("../middleware/auth")
-// Import de file-systeme pour les images 
 const fs = require("fs");
-const { post } = require("../routes/post");
+
 
 // CREATION d'un POST
 exports.createPost = async (req, res, next) => {
@@ -71,7 +66,7 @@ exports.getAllPosts = async (req, res, next) => {
             {model: db.User, attributes: ["username", "email", "avatar"]},
             {model: db.Like, 
                 attributes: ["UserId"],
-                //include: [ {model: db.User, attributes: ["username"]}  ] 
+                include: [ {model: db.User, attributes: ["username"]}  ] 
             },
             {model: db.Comment, 
                 order: [["id", "DESC"]],
@@ -218,7 +213,6 @@ exports.addLike = async (req, res, next) => {
     try {
         const userId = auth.getUserID(req);
         const postId = req.params.id;
-        // On cherche si l'utilisateur aime déjà le post en question
         const userLiked = await db.Like.findOne({ where: { UserId: userId, PostId: postId }, });
         if (userLiked) {
             await db.Like.destroy(

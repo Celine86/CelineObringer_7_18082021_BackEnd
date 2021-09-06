@@ -11,7 +11,6 @@ const config = require(__dirname + '/../config/config.json')[env];
 */
 const db = {};
 
-// Import de dotenv qui charge les variables de .env dans process.env 
 require('dotenv').config();
 // Configuration de la connexion à la BDD, les informations sont ainsi stockées dans .env
 let sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
