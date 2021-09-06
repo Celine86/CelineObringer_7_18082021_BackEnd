@@ -16,6 +16,9 @@ module.exports = {
           key: 'id'
         }
       },
+      modifiedBy: {
+        type: Sequelize.STRING
+      },
       idPOST: {
         allowNull: false,
         type: Sequelize.INTEGER,

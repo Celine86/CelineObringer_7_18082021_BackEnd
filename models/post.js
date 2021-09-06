@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     title: { type: DataTypes.STRING, allowNull: false },
     content: { type: DataTypes.STRING, allowNull: false },
     imageUrl: { type: DataTypes.STRING, allowNull: true },
+    modifiedBy: { type: DataTypes.STRING, allowNull: true },
   }, {
     sequelize,
     modelName: 'Post',

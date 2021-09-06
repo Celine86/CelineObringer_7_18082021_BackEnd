@@ -15,13 +15,20 @@ exports.createPost = async (req, res, next) => {
             } else {
                 imageUrl = null;
             }
-            const myPost = await db.Post.create({
-                title: req.body.title,
-                content: req.body.content,
-                imageUrl: imageUrl,
-                UserId: user.id,
-            }); 
-            res.status(200).json({ post: myPost, message: "Post ajouté" });
+            if(!req.body.title || !req.body.content){
+                fs.unlink(`images/${req.file.filename}`, () => {
+                  res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
+                });
+                // res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
+            } else {
+                const myPost = await db.Post.create({
+                    title: req.body.title,
+                    content: req.body.content,
+                    imageUrl: imageUrl,
+                    UserId: user.id,
+                }); 
+                res.status(200).json({ post: myPost, message: "Post ajouté" });
+            }
         }
         else {
             return res.status(403).send({ error: "Le post n'a pas pu être ajouté" });
@@ -112,6 +119,7 @@ exports.modifyPost = async (req, res, next) => {
         let newImageUrl;
         const userId = auth.getUserID(req);
         const isAdmin = await db.User.findOne({ where: { id: userId } });
+        const hasModified = await db.User.findOne({ where: { id: userId } });
         const thisPost = await db.Post.findOne({ where: { id: req.params.id } });
         if (userId === thisPost.UserId || isAdmin.role === true) {
             if (req.file) {
@@ -120,9 +128,7 @@ exports.modifyPost = async (req, res, next) => {
                     const filename = thisPost.imageUrl.split("/images")[1];
                     fs.unlink(`images/${filename}`, (err) => {
                     if (err) console.log(err);
-                    else {
-                        console.log(`Deleted file: images/${filename}`);
-                        }
+                    else { console.log(`image supprimée: images/${filename}`); }
                     });
                 }
             }
@@ -132,9 +138,10 @@ exports.modifyPost = async (req, res, next) => {
             if (req.body.content) {
                 thisPost.content = req.body.content;
             }
+            thisPost.modifiedBy = hasModified.username;
             thisPost.imageUrl = newImageUrl;
             const newPost = await thisPost.save({
-                fields: ["title", "content", "imageUrl"],
+                fields: ["title", "content", "imageUrl", "modifiedBy"],
             });
             res.status(200).json({ newPost: newPost, message: "le post a été modifié" });
           } 
@@ -152,12 +159,16 @@ exports.createComment = async (req, res, next) => {
         const userId = auth.getUserID(req);
         const user = await db.User.findOne({ where: { id: userId } });
         if (user !== null) { 
-            const myComment = await db.Comment.create({
-                comment: req.body.comment,
-                UserId: user.id,
-                PostId: req.params.id,
-            }); 
-            res.status(200).json({ post: myComment, message: "Commentaire ajouté" });
+            if(!req.body.comment){
+                return res.status(403).send({ error: "Merci de renseigner le corps du message" });
+            } else {
+                const myComment = await db.Comment.create({
+                    comment: req.body.comment,
+                    UserId: user.id,
+                    PostId: req.params.id,
+                }); 
+                res.status(200).json({ post: myComment, message: "Commentaire ajouté" });
+            }
         }
         else {
             return res.status(403).send({ error: "Le commentaire n'a pas pu être ajouté" });
@@ -190,13 +201,15 @@ exports.modifyComment = async (req, res, next) => {
     try {
         const userId = auth.getUserID(req);
         const isAdmin = await db.User.findOne({ where: { id: userId } });
+        const hasModified = await db.User.findOne({ where: { id: userId } });
         const thisComment = await db.Comment.findOne({ where: { id: req.params.id } });
         if (userId === thisComment.UserId || isAdmin.role === true) {
             if (req.body.comment) {
                 thisComment.comment = req.body.comment;
             }
+            thisComment.modifiedBy = hasModified.username;
             const newComment = await thisComment.save({
-                fields: ["comment"],
+                fields: ["comment", "modifiedBy"],
             });
             res.status(200).json({ newComment: newComment, message: "le commentaire a été modifié" });
           } 
