@@ -20,6 +20,8 @@ exports.signup = async (req, res, next) => {
           username: req.body.username,
           email: req.body.email,
           password: hashed,
+          role: false,
+          avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultavatar.png`
         });
       res.status(201).send({ message: 'Votre compte est créé' });
     }
@@ -43,6 +45,9 @@ exports.login = async (req, res, next) => {
       } else {
         res.status(200).json({
           message: 'Connexion OK',
+          username: user.username,
+          email: user.email,
+          role: user.role,
           userId: user.id,
           token: jwt.sign({userId: user.id}, process.env.TOKEN, {expiresIn: '24h'})
       })
@@ -87,10 +92,10 @@ exports.modifyAccount = async (req, res, next) => {
           req.file.filename
         }`;
       const filename = user.avatar.split("/images")[1];
-      fs.unlink(`images/${filename}`, (err) => {
-        if (err) console.log(err);
-        else { console.log(`Image Supprimée: images/${filename}`); }
-      });
+        fs.unlink(`images/${filename}`, (err) => {
+          if (err) console.log(err);
+          else { console.log(`Image Supprimée: images/${filename}`); }
+        });
     } else if (req.file) {
       newAvatar = `${req.protocol}://${req.get("host")}/images/${
         req.file.filename
