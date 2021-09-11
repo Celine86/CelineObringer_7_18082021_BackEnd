@@ -5,8 +5,13 @@ const app = express();
 const path = require("path");
 
 const db = require("./models/index")
-db.sequelize.sync()
-/* Test de connexion à la base de données 
+db.sequelize.sync().then(function () {
+  require("./conf/firstadmin");
+})
+
+/*
+const db = require("./models/index")
+// Test de connexion à la base de données 
 db.sequelize.authenticate()
   .then(() => console.log('Connexion à la base de données réussie'))
   .catch(err => console.log('Connexion impossible: ' + err))

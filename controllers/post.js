@@ -19,7 +19,7 @@ exports.createPost = async (req, res, next) => {
                 fs.unlink(`images/${req.file.filename}`, () => {
                   res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
                 });
-                // res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
+                res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
             } else {
                 const myPost = await db.Post.create({
                     title: req.body.title,
