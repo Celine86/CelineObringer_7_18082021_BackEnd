@@ -14,16 +14,16 @@ exports.signup = async (req, res, next) => {
     });
     if (user !== null) {
         return res.status(401).json({ message: "Ce pseudonyme ou cet email est déjà utilisé" });
-    } else {
-        const hashed = await bcrypt.hash(req.body.password, 10)
+    } else { 
+          const hashed = await bcrypt.hash(req.body.password, 10)
           db.User.create({
           username: req.body.username,
           email: req.body.email,
           password: hashed,
           role: false,
-          avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultavatar.png`
+          avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
         });
-      res.status(201).send({ message: 'Votre compte est créé' });
+        res.status(201).send({ message: 'Votre compte est créé' });
     }
   } catch (error) {
     return res.status(500).send({ message: "Erreur Serveur" });
