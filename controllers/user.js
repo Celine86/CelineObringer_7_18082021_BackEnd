@@ -13,7 +13,7 @@ exports.signup = async (req, res, next) => {
       where: { [Op.or]: [{username: req.body.username}, {email: req.body.email}] },
     });
     if (user !== null) {
-        return res.status(401).json({ message: "Ce pseudonyme ou cet email est déjà utilisé" });
+        return res.status(401).send({ error: "Ce pseudonyme ou cet email est déjà utilisé" });
     } else { 
           const hashed = await bcrypt.hash(req.body.password, 10)
           db.User.create({
@@ -26,7 +26,7 @@ exports.signup = async (req, res, next) => {
         res.status(201).send({ message: 'Votre compte est créé' });
     }
   } catch (error) {
-    return res.status(500).send({ message: "Erreur Serveur" });
+    return res.status(500).send({ error: "Erreur Serveur" });
   }
 };
 
@@ -37,7 +37,7 @@ exports.login = async (req, res, next) => {
       where: {username: req.body.username},
     });
     if (user === null) {
-      return res.status(401).send({ message: "Connexion impossible, merci de vérifier votre login" });
+      return res.status(401).json({ error: "Connexion impossible, merci de vérifier votre login" });
     } else {
       const hashed = await bcrypt.compare(req.body.password, user.password);
       if (!hashed) {
@@ -110,7 +110,7 @@ exports.modifyAccount = async (req, res, next) => {
       message: "Votre avatar a bien été modifié",
     });
     } else {
-      return res.status(401).send({ error: "Vous n'êtes pas autorisé à modifier ce profil" });
+      return res.status(403).send({ error: "Vous n'êtes pas autorisé à modifier ce profil" });
     }
   } catch (error) {
     return res.status(500).send({ error: "Erreur Serveur" });
@@ -135,7 +135,7 @@ exports.deleteAccount = async (req, res) => {
           res.status(200).json({ message: "Compte supprimé" });
         }
     } else {
-      return res.status(401).send({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });
+      return res.status(403).send({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });
     } 
   } catch (error) {
     return res.status(500).send({ error: "Erreur serveur" });

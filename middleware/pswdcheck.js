@@ -11,7 +11,7 @@ pswdModel
 
 module.exports = (req, res, next) => {
     if (!pswdModel.validate(req.body.password)) {
-        res.status(400).json({message:'Le mot de passe doit contenir au moins 12 caractères avec une majuscule, une minuscule, un chiffre et un caractère spécial'})
+        res.status(401).json({message:'Le mot de passe doit contenir au moins 12 caractères avec une majuscule, une minuscule, un chiffre et un caractère spécial'})
     } else {
         next();
     }
