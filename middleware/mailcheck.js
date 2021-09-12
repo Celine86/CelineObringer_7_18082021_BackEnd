@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
             next();
         }
         else{
-            res.status(401).json({message: 'mail non valide'});
+            res.status(401).json({error: 'mail non valide'});
         }
     }
     checkEmail(req.body.email)

@@ -13,7 +13,7 @@ exports.signup = async (req, res, next) => {
       where: { [Op.or]: [{username: req.body.username}, {email: req.body.email}] },
     });
     if (user !== null) {
-        return res.status(401).send({ error: "Ce pseudonyme ou cet email est déjà utilisé" });
+        return res.status(401).json({ error: "Ce pseudonyme ou cet email est déjà utilisé" });
     } else { 
           const hashed = await bcrypt.hash(req.body.password, 10)
           db.User.create({
@@ -23,10 +23,10 @@ exports.signup = async (req, res, next) => {
           role: false,
           avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
         });
-        res.status(201).send({ message: 'Votre compte est créé' });
+        res.status(201).json({ message: 'Votre compte est créé' });
     }
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -41,7 +41,7 @@ exports.login = async (req, res, next) => {
     } else {
       const hashed = await bcrypt.compare(req.body.password, user.password);
       if (!hashed) {
-        return res.status(401).send({ error: "Le mot de passe est incorrect !" });
+        return res.status(401).json({ error: "Le mot de passe est incorrect !" });
       } else {
         res.status(200).json({
           message: 'Connexion OK',
@@ -54,7 +54,7 @@ exports.login = async (req, res, next) => {
       }
     }
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -63,9 +63,9 @@ exports.getOneUser = async (req, res, next) => {
   try {
     const user = await db.User.findOne({ attributes: ["id", "username", "email", "avatar"],
     where: { id: req.params.id } });
-    res.status(200).send({userInfos : user});
+    res.status(200).json({userInfos : user});
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -74,9 +74,9 @@ exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await db.User.findAll({ attributes: ["id", "username", "email", "avatar"],
     where: { role: { [Op.ne]: 1, } }, });
-    res.status(200).send(users);
+    res.status(200).json(users);
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -110,10 +110,10 @@ exports.modifyAccount = async (req, res, next) => {
       message: "Votre avatar a bien été modifié",
     });
     } else {
-      return res.status(403).send({ error: "Vous n'êtes pas autorisé à modifier ce profil" });
+      return res.status(403).json({ error: "Vous n'êtes pas autorisé à modifier ce profil" });
     }
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -135,9 +135,9 @@ exports.deleteAccount = async (req, res) => {
           res.status(200).json({ message: "Compte supprimé" });
         }
     } else {
-      return res.status(403).send({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });
+      return res.status(403).json({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });
     } 
   } catch (error) {
-    return res.status(500).send({ error: "Erreur serveur" });
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 };

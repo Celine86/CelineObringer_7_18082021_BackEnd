@@ -31,10 +31,10 @@ exports.createPost = async (req, res, next) => {
             }
         }
         else {
-            return res.status(403).send({ error: "Le post n'a pas pu être ajouté" });
+            return res.status(403).json({ error: "Le post n'a pas pu être ajouté" });
         }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -57,9 +57,9 @@ exports.getOnePost = async (req, res, next) => {
             ],
             where: { id: req.params.id } 
         });
-        res.status(200).send(post);
+        res.status(200).json(post);
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -82,9 +82,9 @@ exports.getAllPosts = async (req, res, next) => {
             },
         ],
     });
-    res.status(200).send(posts);
+    res.status(200).json(posts);
   } catch (error) {
-    return res.status(500).send({ error: "Erreur Serveur" });
+    return res.status(500).json({ error: "Erreur Serveur" });
   }
 };
 
@@ -109,7 +109,7 @@ exports.deletePost = async (req, res, next) => {
             res.status(400).json({ message: "Vous n'êtes pas autotisé à supprimer ce post" });
           }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -149,7 +149,7 @@ exports.modifyPost = async (req, res, next) => {
             res.status(400).json({ message: "Vous n'êtes pas autorisé à modifier ce post" });
           }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -160,7 +160,7 @@ exports.createComment = async (req, res, next) => {
         const user = await db.User.findOne({ where: { id: userId } });
         if (user !== null) { 
             if(!req.body.comment){
-                return res.status(403).send({ error: "Merci de renseigner le corps du message" });
+                return res.status(403).json({ error: "Merci de renseigner le corps du message" });
             } else {
                 const myComment = await db.Comment.create({
                     comment: req.body.comment,
@@ -171,10 +171,10 @@ exports.createComment = async (req, res, next) => {
             }
         }
         else {
-            return res.status(403).send({ error: "Le commentaire n'a pas pu être ajouté" });
+            return res.status(403).json({ error: "Le commentaire n'a pas pu être ajouté" });
         }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -192,7 +192,7 @@ exports.deleteComment = async (req, res, next) => {
             res.status(400).json({ message: "Vous n'êtes pas autotisé à supprimer ce commentaire" });
           }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -217,7 +217,7 @@ exports.modifyComment = async (req, res, next) => {
             res.status(400).json({ message: "Vous n'êtes pas autorisé à modifier ce commentaire" });
           }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
 
@@ -232,7 +232,7 @@ exports.addLike = async (req, res, next) => {
                 { where: { UserId: userId, PostId: postId } },
                 { truncate: true, restartIdentity: true }                
             );
-            res.status(200).send({ message: "vous n'aimez plus ce post :(" });
+            res.status(200).json({ message: "vous n'aimez plus ce post :(" });
         } else {
             await db.Like.create({
                 UserId: userId,
@@ -241,6 +241,6 @@ exports.addLike = async (req, res, next) => {
             res.status(200).json({ message: "vous aimez ce post !" });
         }
     } catch (error) {
-        return res.status(500).send({ error: "Erreur Serveur" });
+        return res.status(500).json({ error: "Erreur Serveur" });
     }
 };
