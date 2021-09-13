@@ -52,7 +52,7 @@ exports.getOnePost = async (req, res, next) => {
                 {model: db.Comment, 
                     order: [["id", "DESC"]], 
                     attributes: ["comment"],
-                    include: [ {model: db.User, attributes: ["username", "email"]} ]
+                    include: [ {model: db.User, attributes: ["username", "email", "avatar"]} ]
                 }, 
             ],
             where: { id: req.params.id } 
@@ -78,7 +78,7 @@ exports.getAllPosts = async (req, res, next) => {
             {model: db.Comment, 
                 order: [["id", "DESC"]],
                 attributes: ["comment"],
-                include: [ {model: db.User, attributes: ["username", "email"]}  ] 
+                include: [ {model: db.User, attributes: ["username", "email", "avatar"]}  ] 
             },
         ],
     });

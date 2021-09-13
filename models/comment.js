@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Comment.init({
-    comment: { type: DataTypes.STRING, allowNull: false },
+    comment: { type: DataTypes.TEXT, allowNull: false },
     modifiedBy: { type: DataTypes.STRING, allowNull: true },
   }, {
     sequelize,
