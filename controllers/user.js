@@ -128,11 +128,11 @@ exports.deleteAccount = async (req, res) => {
         const filename = user.avatar.split("/images")[1];
         fs.unlink(`images/${filename}`, () => {
           db.User.destroy({ where: { id: req.params.id } });
-          res.status(200).json({ message: "Compte supprimé" });
+          res.status(200).json({ message: "Le compte a été supprimé" });
         });
         } else {
           db.User.destroy({ where: { id: req.params.id } });
-          res.status(200).json({ message: "Compte supprimé" });
+          res.status(200).json({ message: "Le compte a été supprimé" });
         }
     } else {
       return res.status(403).json({ error: "Vous n'êtes pas autorisé à supprimer ce compte" });

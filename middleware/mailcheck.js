@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
             next();
         }
         else{
-            res.status(401).json({error: 'mail non valide'});
+            res.status(401).json({error: 'Merci de vérifier votre mail. Il doit être sous la forme pseudo@mail.mail. Par exemple JohnDoe@groupomania.group'});
         }
     }
     checkEmail(req.body.email)

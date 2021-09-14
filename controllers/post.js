@@ -18,7 +18,7 @@ exports.createPost = async (req, res, next) => {
             if(!req.body.title || !req.body.content){
                 fs.unlink(`images/${req.file.filename}`, () => {
                   res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
-                });
+                }); //Si une image est ajouté et que la requête est en erreur, l'image sera quand même dans le folder, donc on évite cela
                 res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
             } else {
                 const myPost = await db.Post.create({
@@ -44,15 +44,15 @@ exports.getOnePost = async (req, res, next) => {
         const post = await db.Post.findOne({ 
             attributes: ["id", "title", "content", "imageUrl"], 
             include: [
-                {model: db.User, attributes: ["username", "email", "avatar"]},
+                {model: db.User, attributes: ["id", "username", "email", "avatar"]},
                 {model: db.Like, 
                     attributes: ["UserId"],
                     include: [ {model: db.User, attributes: ["username"]}  ] 
                 },
                 {model: db.Comment, 
-                    order: [["id", "DESC"]], 
-                    attributes: ["comment"],
-                    include: [ {model: db.User, attributes: ["username", "email", "avatar"]} ]
+                    limit: 100, order: [['id', 'DESC']], 
+                    attributes: ["id", "comment"],
+                    include: [ {model: db.User, attributes: ["id", "username", "email", "avatar"]} ]
                 }, 
             ],
             where: { id: req.params.id } 
@@ -67,18 +67,19 @@ exports.getOnePost = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
   try {
     const posts = await db.Post.findAll({ 
-        limit: 10, order: [['id', 'DESC']], 
+        limit: 50, order: [['id', 'DESC']], 
         attributes: ['id', 'title', 'content', 'imageUrl'],
         include: [
-            {model: db.User, attributes: ["username", "email", "avatar"]},
+            {model: db.User, attributes: ["id", "username", "email", "avatar"]},
             {model: db.Like, 
                 attributes: ["UserId"],
+                order: [['id', 'DESC']],
                 include: [ {model: db.User, attributes: ["username"]}  ] 
             },
             {model: db.Comment, 
-                order: [["id", "DESC"]],
-                attributes: ["comment"],
-                include: [ {model: db.User, attributes: ["username", "email", "avatar"]}  ] 
+                //limit: 100, order: [["id", "DESC"]],
+                attributes: ["id", "comment"],
+                include: [ {model: db.User, attributes: ["id", "username", "email", "avatar"]}  ] 
             },
         ],
     });
@@ -99,14 +100,14 @@ exports.deletePost = async (req, res, next) => {
               const filename = thisPost.imageUrl.split("/images")[1];
               fs.unlink(`images/${filename}`, () => {
                 db.Post.destroy({ where: { id: thisPost.id } });
-                res.status(200).json({ message: "Post supprimé" });
+                res.status(200).json({ message: "Le Post a été supprimé" });
               });
             } else {
               db.Post.destroy({ where: { id: thisPost.id } }, { truncate: true });
-              res.status(200).json({ message: "Post supprimé" });
+              res.status(200).json({ message: "Le Post a été supprimé" });
             }
           } else {
-            res.status(400).json({ message: "Vous n'êtes pas autotisé à supprimer ce post" });
+            res.status(400).json({ message: "Vous n'êtes pas autotisé à supprimer ce Post" });
           }
     } catch (error) {
         return res.status(500).json({ error: "Erreur Serveur" });
@@ -143,7 +144,7 @@ exports.modifyPost = async (req, res, next) => {
             const newPost = await thisPost.save({
                 fields: ["title", "content", "imageUrl", "modifiedBy"],
             });
-            res.status(200).json({ newPost: newPost, message: "le post a été modifié" });
+            res.status(200).json({ newPost: newPost, message: "Le Post a été modifié" });
           } 
           else {
             res.status(400).json({ message: "Vous n'êtes pas autorisé à modifier ce post" });
@@ -167,12 +168,28 @@ exports.createComment = async (req, res, next) => {
                     UserId: user.id,
                     PostId: req.params.id,
                 }); 
-                res.status(200).json({ post: myComment, message: "Commentaire ajouté" });
+                res.status(200).json({ post: myComment, message: "Le Commentaire a été ajouté" });
             }
         }
         else {
             return res.status(403).json({ error: "Le commentaire n'a pas pu être ajouté" });
         }
+    } catch (error) {
+        return res.status(500).json({ error: "Erreur Serveur" });
+    }
+};
+
+// AFFICHER un COMMENTAIRE
+exports.getOneComment = async (req, res, next) => {
+    try {
+        const comment = await db.Comment.findOne({ 
+            attributes: ["id", "comment"], 
+            include: [
+                {model: db.User, attributes: ["id", "username", "email", "avatar"]},
+            ],
+            where: { id: req.params.id } 
+        });
+        res.status(200).json(comment);
     } catch (error) {
         return res.status(500).json({ error: "Erreur Serveur" });
     }
@@ -186,7 +203,7 @@ exports.deleteComment = async (req, res, next) => {
         const thisComment = await db.Comment.findOne({ where: { id: req.params.id } });
         if (userId === thisComment.UserId || isAdmin.role === true) {
               db.Comment.destroy({ where: { id: thisComment.id } }, { truncate: true });
-              res.status(200).json({ message: "Commentaire supprimé" });
+              res.status(200).json({ message: "Le Commentaire a été supprimé" });
             }
         else {
             res.status(400).json({ message: "Vous n'êtes pas autotisé à supprimer ce commentaire" });
@@ -211,7 +228,7 @@ exports.modifyComment = async (req, res, next) => {
             const newComment = await thisComment.save({
                 fields: ["comment", "modifiedBy"],
             });
-            res.status(200).json({ newComment: newComment, message: "le commentaire a été modifié" });
+            res.status(200).json({ newComment: newComment, message: "Le Commentaire a été modifié" });
           } 
           else {
             res.status(400).json({ message: "Vous n'êtes pas autorisé à modifier ce commentaire" });
@@ -232,13 +249,13 @@ exports.addLike = async (req, res, next) => {
                 { where: { UserId: userId, PostId: postId } },
                 { truncate: true, restartIdentity: true }                
             );
-            res.status(200).json({ message: "vous n'aimez plus ce post :(" });
+            res.status(200).json({ message: "Vous n'aimez plus ce post :(" });
         } else {
             await db.Like.create({
                 UserId: userId,
                 PostId: postId,
             });
-            res.status(200).json({ message: "vous aimez ce post !" });
+            res.status(200).json({ message: "Vous aimez ce post !" });
         }
     } catch (error) {
         return res.status(500).json({ error: "Erreur Serveur" });
