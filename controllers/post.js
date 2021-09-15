@@ -183,9 +183,9 @@ exports.createComment = async (req, res, next) => {
 exports.getOneComment = async (req, res, next) => {
     try {
         const comment = await db.Comment.findOne({ 
-            attributes: ["id", "comment"], 
+            attributes: ["id", "comment", "modifiedBy"], 
             include: [
-                {model: db.User, attributes: ["id", "username", "email", "avatar", "modifiedBy"]},
+                {model: db.User, attributes: ["id", "username", "email", "avatar"]},
             ],
             where: { id: req.params.id } 
         });
