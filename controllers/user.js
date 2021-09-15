@@ -23,7 +23,7 @@ exports.signup = async (req, res, next) => {
           role: false,
           avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
         });
-        res.status(201).json({ message: 'Votre compte est créé' });
+        res.status(201).json({ message: "Votre compte est créé" });
     }
   } catch (error) {
     return res.status(500).json({ error: "Erreur Serveur" });
@@ -44,7 +44,7 @@ exports.login = async (req, res, next) => {
         return res.status(401).json({ error: "Le mot de passe est incorrect !" });
       } else {
         res.status(200).json({
-          message: 'Connexion OK',
+          message: "Vous êtes connecté",
           username: user.username,
           email: user.email,
           role: user.role,

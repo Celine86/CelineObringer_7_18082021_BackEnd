@@ -42,7 +42,7 @@ exports.createPost = async (req, res, next) => {
 exports.getOnePost = async (req, res, next) => {
     try {
         const post = await db.Post.findOne({ 
-            attributes: ["id", "title", "content", "imageUrl"], 
+            attributes: ["id", "title", "content", "imageUrl", "modifiedBy"], 
             include: [
                 {model: db.User, attributes: ["id", "username", "email", "avatar"]},
                 {model: db.Like, 
@@ -50,8 +50,8 @@ exports.getOnePost = async (req, res, next) => {
                     include: [ {model: db.User, attributes: ["username"]}  ] 
                 },
                 {model: db.Comment, 
-                    limit: 100, order: [['id', 'DESC']], 
-                    attributes: ["id", "comment"],
+                    limit: 100, order: [["id", "DESC"]], 
+                    attributes: ["id", "comment", "modifiedBy"],
                     include: [ {model: db.User, attributes: ["id", "username", "email", "avatar"]} ]
                 }, 
             ],
@@ -67,18 +67,18 @@ exports.getOnePost = async (req, res, next) => {
 exports.getAllPosts = async (req, res, next) => {
   try {
     const posts = await db.Post.findAll({ 
-        limit: 50, order: [['id', 'DESC']], 
-        attributes: ['id', 'title', 'content', 'imageUrl'],
+        limit: 50, order: [["id", "DESC"]], 
+        attributes: ["id", "title", "content", "imageUrl", "modifiedBy"],
         include: [
             {model: db.User, attributes: ["id", "username", "email", "avatar"]},
             {model: db.Like, 
                 attributes: ["UserId"],
-                order: [['id', 'DESC']],
+                order: [["id", "DESC"]],
                 include: [ {model: db.User, attributes: ["username"]}  ] 
             },
             {model: db.Comment, 
                 //limit: 100, order: [["id", "DESC"]],
-                attributes: ["id", "comment"],
+                attributes: ["id", "comment", "modifiedBy"],
                 include: [ {model: db.User, attributes: ["id", "username", "email", "avatar"]}  ] 
             },
         ],
@@ -185,7 +185,7 @@ exports.getOneComment = async (req, res, next) => {
         const comment = await db.Comment.findOne({ 
             attributes: ["id", "comment"], 
             include: [
-                {model: db.User, attributes: ["id", "username", "email", "avatar"]},
+                {model: db.User, attributes: ["id", "username", "email", "avatar", "modifiedBy"]},
             ],
             where: { id: req.params.id } 
         });
