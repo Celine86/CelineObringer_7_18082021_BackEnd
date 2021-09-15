@@ -23,7 +23,7 @@ exports.signup = async (req, res, next) => {
           role: false,
           avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
         });
-        res.status(201).json({ message: "Votre compte est créé" });
+        res.status(201).json({ message: "Votre compte est créé. Vous pouvez vous connecter avec votre identifiant et mot de passe !" });
     }
   } catch (error) {
     return res.status(500).json({ error: "Erreur Serveur" });
