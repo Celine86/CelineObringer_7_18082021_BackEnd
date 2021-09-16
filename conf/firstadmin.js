@@ -12,7 +12,6 @@ function firstAdmin(req, res) {
               username: "admin",
               email: "admin@groupomania.group",
               password: hash,
-              avatar: `${process.env.SERVERADDRESS}/imagesdefault/defaultadminavatar.png`,
               role: true,
             })
               .then((admin) => {
