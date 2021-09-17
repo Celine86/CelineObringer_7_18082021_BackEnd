@@ -14,6 +14,6 @@ router.post("/:id/comment", auth.signin, postCtrl.createComment);
 router.delete("/comment/:id", auth.signin, postCtrl.deleteComment);
 router.put("/comment/:id", auth.signin, postCtrl.modifyComment);
 router.get("/comment/:id", auth.signin, postCtrl.getOneComment);
-router.post("/:id/like", auth.signin, postCtrl.addLike);
+//router.post("/:id/like", auth.signin, postCtrl.addLike);
 
 module.exports = router;

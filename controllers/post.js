@@ -45,10 +45,10 @@ exports.getOnePost = async (req, res, next) => {
             attributes: ["id", "title", "content", "imageUrl", "modifiedBy"], 
             include: [
                 {model: db.User, attributes: ["id", "username", "email", "avatar"]},
-                {model: db.Like, 
+                /*{model: db.Like, 
                     attributes: ["UserId"],
                     include: [ {model: db.User, attributes: ["username"]}  ] 
-                },
+                },*/
                 {model: db.Comment, 
                     limit: 100, order: [["id", "DESC"]], 
                     attributes: ["id", "comment", "modifiedBy"],
@@ -71,13 +71,12 @@ exports.getAllPosts = async (req, res, next) => {
         attributes: ["id", "title", "content", "imageUrl", "modifiedBy"],
         include: [
             {model: db.User, attributes: ["id", "username", "email", "avatar"]},
-            {model: db.Like, 
+            /*{model: db.Like, 
                 attributes: ["UserId"],
                 order: [["id", "DESC"]],
                 include: [ {model: db.User, attributes: ["username"]}  ] 
-            },
+            },*/
             {model: db.Comment, 
-                //limit: 100, order: [["id", "DESC"]],
                 attributes: ["id", "comment", "modifiedBy"],
                 include: [ {model: db.User, attributes: ["id", "username", "email", "avatar"]}  ] 
             },
@@ -239,7 +238,7 @@ exports.modifyComment = async (req, res, next) => {
 };
 
 // AIMER un POST
-exports.addLike = async (req, res, next) => {
+/* exports.addLike = async (req, res, next) => {
     try {
         const userId = auth.getUserID(req);
         const postId = req.params.id;
@@ -260,4 +259,4 @@ exports.addLike = async (req, res, next) => {
     } catch (error) {
         return res.status(500).json({ error: "Erreur Serveur" });
     }
-};
+}; */

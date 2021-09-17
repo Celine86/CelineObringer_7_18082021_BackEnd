@@ -11,6 +11,7 @@ function firstAdmin(req, res) {
             const admin = db.User.create({
               username: "admin",
               email: "admin@groupomania.group",
+              avatar: `${process.env.SERVERADDRESS}imagesdefault/defaultuseravatar.png`,
               password: hash,
               role: true,
             })
