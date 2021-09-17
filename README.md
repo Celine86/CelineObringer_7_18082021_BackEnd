@@ -4,7 +4,7 @@
 L'objectif de ce projet est de réaliser le back-end et le front-end d'un réseau social d'entreprise.  
   
 Concernant le Back-End:  
-Le stack utilisé pour le backend est le suivant :  
+La stack utilisé pour le backend est le suivant :  
 - MySQL  
 - Sequelize  
 - NodeJS  
