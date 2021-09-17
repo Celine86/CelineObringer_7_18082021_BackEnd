@@ -8,25 +8,29 @@ const fs = require("fs");
 
 // SIGNUP pour l'enregistrement d'un profil
 exports.signup = async (req, res, next) => {
-  try {
-    const user = await db.User.findOne({
-      where: { [Op.or]: [{username: req.body.username}, {email: req.body.email}] },
-    });
-    if (user !== null) {
-        return res.status(401).json({ error: "Ce pseudonyme ou cet email est déjà utilisé" });
-    } else { 
-          const hashed = await bcrypt.hash(req.body.password, 10)
-          db.User.create({
-          username: req.body.username,
-          email: req.body.email,
-          password: hashed,
-          role: false,
-          avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
-        });
-        res.status(201).json({ message: "Votre compte est créé. Vous pouvez vous connecter avec votre identifiant et mot de passe !" });
+  if (req.body.username && req.body.email && req.body.password) {
+    try {
+      const user = await db.User.findOne({
+        where: { [Op.or]: [{username: req.body.username}, {email: req.body.email}] },
+      });
+      if (user !== null) {
+          return res.status(401).json({ error: "Ce pseudonyme ou cet email est déjà utilisé" });
+      } else { 
+            const hashed = await bcrypt.hash(req.body.password, 10)
+            db.User.create({
+            username: req.body.username,
+            email: req.body.email,
+            password: hashed,
+            role: false,
+            avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
+          });
+          res.status(201).json({ message: "Votre compte est créé. Vous pouvez vous connecter avec votre identifiant et mot de passe !" });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: "Erreur Serveur" });
     }
-  } catch (error) {
-    return res.status(500).json({ error: "Erreur Serveur" });
+  } else {
+    return res.status(401).json({ error: "Vous devez renseigner tous les champs pour vous inscrire !" });
   }
 };
 
