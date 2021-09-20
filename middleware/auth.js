@@ -3,18 +3,15 @@ const jwt = require('jsonwebtoken');
 // Fonction de vérification globale du token afin d'autoriser la connexion générale de l'utilisateur 
 exports.signin = (req, res, next) => {
   try {
+    // Récupération de la requête, des entêtes de la requête et l'en-tête autorisation de la requête
+    // On sépare ensuite le Bearer de la valeur token, la case 0 est celle du bearer et la 1 celle du token
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, process.env.TOKEN);
-    const userId = decodedToken.userId;
-    if (req.body.userId && req.body.userId !== userId) {
-      res.status(401).json({message: '401: Utilisateur non authentifié'})
-    } else {
-      next();
-    }
+    // jwt.verify va vérifier que le token est bon et non expiré
+    // jwt va faire une série de vérifications et si il y a un problème le code passera dans le catch
+    jwt.verify(token, process.env.TOKEN);
+    next();
   } catch {
-    res.status(401).json({
-      error: new Error('Utilisateur Non Authentifié!')
-    });
+    res.status(401).json({ error: 'Utilisateur Non Authentifié!' });
   }
 };
 

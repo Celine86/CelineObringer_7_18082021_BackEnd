@@ -1,7 +1,7 @@
 const db = require("../models"); 
 const auth = require("../middleware/auth")
 const fs = require("fs");
-
+const xss = require("xss");
 
 // CREATION d'un POST
 exports.createPost = async (req, res, next) => {
@@ -22,8 +22,8 @@ exports.createPost = async (req, res, next) => {
                 res.status(403).json({ message: "Merci de renseigner le titre et le corps du message" });
             } else {
                 const myPost = await db.Post.create({
-                    title: req.body.title,
-                    content: req.body.content,
+                    title: xss(req.body.title),
+                    content: xss(req.body.content),
                     imageUrl: imageUrl,
                     UserId: user.id,
                 }); 
@@ -133,10 +133,10 @@ exports.modifyPost = async (req, res, next) => {
                 }
             }
             if (req.body.title) {
-                thisPost.title = req.body.title;
+                thisPost.title = xss(req.body.title);
             }
             if (req.body.content) {
-                thisPost.content = req.body.content;
+                thisPost.content = xss(req.body.content);
             }
             thisPost.modifiedBy = hasModified.username;
             thisPost.imageUrl = newImageUrl;
@@ -163,7 +163,7 @@ exports.createComment = async (req, res, next) => {
                 return res.status(403).json({ error: "Merci de renseigner le corps du message" });
             } else {
                 const myComment = await db.Comment.create({
-                    comment: req.body.comment,
+                    comment: xss(req.body.comment),
                     UserId: user.id,
                     PostId: req.params.id,
                 }); 
@@ -221,7 +221,7 @@ exports.modifyComment = async (req, res, next) => {
         const thisComment = await db.Comment.findOne({ where: { id: req.params.id } });
         if (userId === thisComment.UserId || isAdmin.role === true) {
             if (req.body.comment) {
-                thisComment.comment = req.body.comment;
+                thisComment.comment = xss(req.body.comment);
             }
             thisComment.modifiedBy = hasModified.username;
             const newComment = await thisComment.save({

@@ -5,6 +5,7 @@ const auth = require("../middleware/auth")
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const fs = require("fs");
+const xss = require("xss");
 
 // SIGNUP pour l'enregistrement d'un profil
 exports.signup = async (req, res, next) => {
@@ -18,8 +19,8 @@ exports.signup = async (req, res, next) => {
       } else { 
             const hashed = await bcrypt.hash(req.body.password, 10)
             db.User.create({
-            username: req.body.username,
-            email: req.body.email,
+            username: xss(req.body.username),
+            email: xss(req.body.email),
             password: hashed,
             role: false,
             avatar: `${req.protocol}://${req.get("host")}/imagesdefault/defaultuseravatar.png`
